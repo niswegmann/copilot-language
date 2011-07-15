@@ -27,7 +27,8 @@ import Data.List (foldl')
 
 import Copilot.Core (Typed)
 import qualified Copilot.Core as Core
-import Copilot.Language.Stream
+import Copilot.Language.Clock
+import Copilot.Language.Node
 
 --------------------------------------------------------------------------------
 
@@ -70,24 +71,24 @@ data Observer where
   Observer
     :: Typed a
     => String
-    -> Stream a
+    -> Node a
     -> Observer
 
 --------------------------------------------------------------------------------
 
-observer 
+observer
   :: Typed a
   => String
-  -> Stream a
+  -> CStream Master a
   -> Spec
-observer name e = tell [ObserverItem $ Observer name e]
+observer name e = tell [ObserverItem $ Observer name (unCStream e)]
 
 --------------------------------------------------------------------------------
 
 data Trigger where
   Trigger
     :: Core.Name
-    -> Stream Bool
+    -> Node Bool
     -> [TriggerArg]
     -> Trigger
 
@@ -96,21 +97,21 @@ data Trigger where
 data TriggerArg where
   TriggerArg
     :: Typed a
-    => Stream a
+    => Node a
     -> TriggerArg
 
 --------------------------------------------------------------------------------
 
 trigger
   :: String
-  -> Stream Bool
+  -> CStream Master Bool
   -> [TriggerArg]
   -> Spec 
-trigger name e args = tell [TriggerItem $ Trigger name e args]
+trigger name e args = tell [TriggerItem $ Trigger name (unCStream e) args]
 
 --------------------------------------------------------------------------------
 
-arg :: Typed a => Stream a -> TriggerArg
-arg = TriggerArg
+arg :: Typed a => CStream Master a -> TriggerArg
+arg = TriggerArg . unCStream
 
 --------------------------------------------------------------------------------

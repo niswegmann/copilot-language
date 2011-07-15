@@ -36,18 +36,23 @@ library
     Copilot.Language.Operators.Constant
     Copilot.Language.Operators.Eq
     Copilot.Language.Operators.Extern
+    Copilot.Language.Operators.Fractional
+    Copilot.Language.Operators.Floating
     Copilot.Language.Operators.Local
     Copilot.Language.Operators.Integral
     Copilot.Language.Operators.Mux
+    Copilot.Language.Operators.Num
     Copilot.Language.Operators.Ord
     Copilot.Language.Operators.Temporal
     Copilot.Language.Prelude
     Copilot.Language.Reify
 --    Copilot.Language.Reify.Graph
+--    Copilot.Library.Clock
 
   other-modules:
     Copilot.Language.Analyze
-    Copilot.Language.Stream
+    Copilot.Language.Clock
+    Copilot.Language.Node
     Copilot.Language.Spec
     System.Mem.StableName.Dynamic
     System.Mem.StableName.Dynamic.Map

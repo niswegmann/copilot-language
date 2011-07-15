@@ -2,6 +2,8 @@
 -- Copyright © 2011 National Institute of Aerospace / Galois, Inc.
 --------------------------------------------------------------------------------
 
+{-# LANGUAGE ScopedTypeVariables #-}
+
 -- |
 
 module Copilot.Language.Operators.Temporal
@@ -10,21 +12,23 @@ module Copilot.Language.Operators.Temporal
   ) where
 
 import Copilot.Core (Typed)
+import Copilot.Language.Clock
+import Copilot.Language.Node
 import Copilot.Language.Prelude
-import Copilot.Language.Stream
 import Prelude ()
 
 --------------------------------------------------------------------------------
 
 infixr 3 ++
 
-(++) :: Typed a => [a] -> Stream a -> Stream a
-(++) = (`Append` Nothing)
+(++) :: forall a p . (Clock p, Typed a) => [a] -> CStream p a -> CStream p a
+xs ++ e = CStream $ Append xs g (unCStream e)
+  where
+    g = case clock (undefined :: p) of
+      CStream (Const True) -> Nothing
+      CStream e1           -> Just e1
 
-drop :: Typed a => Int -> Stream a -> Stream a
---drop 0 s             = s
---drop _ ( Const j )   = Const j
---drop i ( Drop  j s ) = Drop (fromIntegral i + j) s
-drop i s             = Drop (fromIntegral i)     s
+drop :: Typed a => Int -> CStream p a -> CStream p a
+drop i = CStream . Drop (fromIntegral i) . unCStream
 
 --------------------------------------------------------------------------------

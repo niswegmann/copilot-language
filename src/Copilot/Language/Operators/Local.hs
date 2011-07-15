@@ -9,11 +9,16 @@ module Copilot.Language.Operators.Local
   ) where
 
 import Copilot.Core (Typed)
-import Copilot.Language.Stream (Stream (..))
+import Copilot.Language.Clock
+import Copilot.Language.Node
 
 --------------------------------------------------------------------------------
 
-local :: (Typed a, Typed b) => Stream a -> (Stream a -> Stream b) -> Stream b
-local = Local
+local
+  :: (Typed a, Typed b)
+  => CStream p a
+  -> (CStream p a -> CStream p b)
+  -> CStream p b
+local (CStream e) f = CStream $ Local e (unCStream . f . CStream)
 
 --------------------------------------------------------------------------------

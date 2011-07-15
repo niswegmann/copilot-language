@@ -15,10 +15,11 @@ module Copilot.Language.Operators.Boolean
   ) where
 
 import qualified Copilot.Core as Core
+import Copilot.Language.Clock
+import Copilot.Language.Node
 import Copilot.Language.Prelude
 import Copilot.Language.Operators.Constant (constant)
-import Copilot.Language.Stream
-import qualified Prelude as P
+import Prelude ()
 
 --------------------------------------------------------------------------------
 
@@ -30,30 +31,19 @@ false = constant False
 
 infix 5 &&
 
-(&&) :: Stream Bool -> Stream Bool -> Stream Bool
-(Const False) && _ = false
-_ && (Const False) = false
-(Const True) && y  = y
-x && (Const True)  = x
-x && y             = Op2 Core.and x y
+(&&) :: CStream p Bool -> CStream p Bool -> CStream p Bool
+CStream x && CStream y = CStream $ Op2 Core.and x y
 
 infix 5 ||
 
-(||) :: Stream Bool -> Stream Bool -> Stream Bool
-(Const True) || _  = true
-_ || (Const True)  = true
-(Const False) || y = y
-x || (Const False) = x
-x || y             = Op2 Core.or x y
+(||) :: CStream p Bool -> CStream p Bool -> CStream p Bool
+CStream x || CStream y = CStream $ Op2 Core.or x y
 
-not :: Stream Bool -> Stream Bool
-not (Const c) = (Const $ P.not c)
-not x         = Op1 Core.not x
+not :: CStream p Bool -> CStream p Bool
+not = CStream . Op1 Core.not . unCStream
 
-xor :: Stream Bool -> Stream Bool -> Stream Bool
-xor x y = ( not x && y ) || ( x && not y )
+xor :: CStream p Bool -> CStream p Bool -> CStream p Bool
+x `xor` y = ( not x && y ) || ( x && not y )
 
-(==>) :: Stream Bool -> Stream Bool -> Stream Bool
+(==>) :: CStream p Bool -> CStream p Bool -> CStream p Bool
 x ==> y = not x || y
-
---------------------------------------------------------------------------------

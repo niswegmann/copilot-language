@@ -8,63 +8,61 @@
 {-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE Rank2Types #-}
 
-module Copilot.Language.Stream
-  ( Stream (..)
+module Copilot.Language.Node
+  ( Node (..)
   ) where
 
-import Copilot.Core (Typed, typeOf)
+import Copilot.Core (Typed)
 import qualified Copilot.Core as Core
-import Copilot.Language.Prelude
---import Data.Word (Word8)
-import qualified Prelude as P
 
 --------------------------------------------------------------------------------
 
-data Stream :: * -> * where
+data Node :: * -> * where
   Append
     :: Typed a
     => [a]
-    -> Maybe (Stream Bool)
-    -> Stream a
-    -> Stream a
+    -> Maybe (Node Bool)
+    -> Node a
+    -> Node a
   Const
     :: Typed a
     => a
-    -> Stream a
+    -> Node a
   Drop
     :: Typed a
     => Int
-    -> Stream a
-    -> Stream a
+    -> Node a
+    -> Node a
   Extern
     :: Typed a
     => String
-    -> Stream a
+    -> Node a
   Local
     :: (Typed a, Typed b)
-    => Stream a
-    -> (Stream a -> Stream b)
-    -> Stream b
+    => Node a
+    -> (Node a -> Node b)
+    -> Node b
   Var
     :: Typed a
     => String
-    -> Stream a
+    -> Node a
   Op1
     :: (Typed a, Typed b)
     => (forall op . Core.Op1 op => op a b)
-    -> Stream a -> Stream b
+    -> Node a -> Node b
   Op2
     :: (Typed a, Typed b, Typed c)
     => (forall op . Core.Op2 op => op a b c)
-    -> Stream a -> Stream b -> Stream c
+    -> Node a -> Node b -> Node c
   Op3
     :: (Typed a, Typed b, Typed c, Typed d)
     => (forall op . Core.Op3 op => op a b c d)
-    -> Stream a
-    -> Stream b
-    -> Stream c
-    -> Stream d
+    -> Node a
+    -> Node b
+    -> Node c
+    -> Node d
 
+{-
 --------------------------------------------------------------------------------
 
 -- | Dummy instance in order to make 'Stream' an instance of 'Num'.
@@ -142,4 +140,4 @@ instance (Typed a, Floating a) => Floating (Stream a) where
   acosh        = Op1 (Core.acosh typeOf)
 
 --------------------------------------------------------------------------------
-
+-}

@@ -14,10 +14,9 @@ module Copilot.Language.Reify
 
 import Copilot.Core (Typed, Id, typeOf)
 import qualified Copilot.Core as Core
---import Copilot.Language.Reify.Sharing (makeSharingExplicit)
 import Copilot.Language.Analyze (analyze)
 import Copilot.Language.Spec
-import Copilot.Language.Stream (Stream (..))
+import Copilot.Language.Node (Node (..))
 import Data.IORef
 import Prelude hiding (id)
 import System.Mem.StableName.Dynamic
@@ -102,7 +101,7 @@ mkExpr
   => IORef Int
   -> IORef (Map Core.Id)
   -> IORef [Core.Stream]
-  -> Stream a
+  -> Node a
   -> IO (WrapExpr a)
 mkExpr refMkId refStreams refMap = go
 
@@ -112,7 +111,7 @@ mkExpr refMkId refStreams refMap = go
 
   go
     :: Typed a
-    => Stream a
+    => Node a
     -> IO (WrapExpr a)
   go e0 =
     case e0 of
@@ -157,7 +156,7 @@ mkStream
   => IORef Int
   -> IORef (Map Core.Id)
   -> IORef [Core.Stream]
-  -> Stream a
+  -> Node a
   -> IO Id
 mkStream refMkId refStreams refMap e0 =
   do
@@ -182,7 +181,7 @@ mkStream refMkId refStreams refMap e0 =
     :: Typed a
     => DynStableName
     -> [a]
-    -> Stream a
+    -> Node a
     -> IO Id
   addToVisited dstn buf e =
     do

@@ -25,7 +25,7 @@ import Copilot.Language.Operators.Mux
 import Copilot.Language.Operators.Ord
 import Copilot.Language.Operators.Temporal
 import Copilot.Language.Prelude
---import Copilot.Language.Reify
+import Copilot.Language.Reify
 import Copilot.Language.Stream
 import qualified Prelude as P
 

@@ -15,7 +15,7 @@ module Copilot.Language.Analyze
 import Control.Exception (Exception, throw)
 import Copilot.Language.Spec
 import Copilot.Core (DropIdx)
-import Copilot.Language.Stream (Stream (..))
+import Copilot.Language.Node (Node (..))
 import Data.IORef
 import Data.Typeable
 import System.Mem.StableName.Dynamic
@@ -75,12 +75,12 @@ analyzeObserver refStreams (Observer _ e) = analyzeExpr refStreams e
 --------------------------------------------------------------------------------
 
 {-# INLINE analyzeExpr #-}
-analyzeExpr :: IORef Env -> Stream a -> IO ()
+analyzeExpr :: IORef Env -> Node a -> IO ()
 analyzeExpr refStreams = go M.empty
 
   where
 
-  go :: Env -> Stream b -> IO ()
+  go :: Env -> Node b -> IO ()
   go nodes e0 =
     do
       dstn <- makeDynStableName e0
@@ -100,7 +100,7 @@ analyzeExpr refStreams = go M.empty
         _              -> return ()
 
   {-# INLINE assertNotVisited #-}
-  assertNotVisited :: Stream a -> DynStableName -> Env -> IO ()
+  assertNotVisited :: Node a -> DynStableName -> Env -> IO ()
   assertNotVisited (Append _ _ _) _    _     = return ()
   assertNotVisited _              dstn nodes =
     case M.lookup dstn nodes of
@@ -110,7 +110,7 @@ analyzeExpr refStreams = go M.empty
 --------------------------------------------------------------------------------
 
 {-# INLINE analyzeAppend #-}
-analyzeAppend :: IORef Env -> DynStableName -> Stream a -> IO ()
+analyzeAppend :: IORef Env -> DynStableName -> Node a -> IO ()
 analyzeAppend refStreams dstn e =
   do
     streams <- readIORef refStreams
@@ -124,7 +124,7 @@ analyzeAppend refStreams dstn e =
 --------------------------------------------------------------------------------
 
 {-# INLINE analyzeDrop #-}
-analyzeDrop :: Int -> Stream a -> IO ()
+analyzeDrop :: Int -> Node a -> IO ()
 analyzeDrop k (Append xs _ _)
   | k >= length xs                         = throw DropIndexOverflow
   | k > fromIntegral (maxBound :: DropIdx) = throw DropMaxViolation

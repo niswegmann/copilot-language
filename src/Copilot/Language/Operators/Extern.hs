@@ -9,11 +9,12 @@ module Copilot.Language.Operators.Extern
   ) where
 
 import Copilot.Core (Typed)
-import Copilot.Language.Stream
+import Copilot.Language.Clock
+import Copilot.Language.Node
 
 --------------------------------------------------------------------------------
 
-extern :: Typed a => String -> Stream a
-extern = Extern
+extern :: Typed a => String -> CStream Master a
+extern = CStream . Extern
 
 --------------------------------------------------------------------------------

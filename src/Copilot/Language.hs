@@ -20,7 +20,11 @@ module Copilot.Language
   , module Copilot.Language.Operators.Ord
   , module Copilot.Language.Operators.Temporal
   , Spec
+  , Clock
+  , CStream
   , Stream
+  , Master
+  , resample
   , observer
   , trigger
   , arg
@@ -37,14 +41,17 @@ import Copilot.Language.Operators.Boolean
 import Copilot.Language.Operators.Constant
 import Copilot.Language.Operators.Eq
 import Copilot.Language.Operators.Extern
+import Copilot.Language.Operators.Fractional ()
+import Copilot.Language.Operators.Floating ()
 import Copilot.Language.Operators.Integral
 import Copilot.Language.Operators.Local
 import Copilot.Language.Operators.Mux
+import Copilot.Language.Operators.Num ()
 import Copilot.Language.Operators.Ord
 import Copilot.Language.Operators.Temporal
 import Copilot.Language.Reify
 import Copilot.Language.Spec (Spec, trigger, arg, observer)
-import Copilot.Language.Stream (Stream)
+import Copilot.Language.Clock (Clock (..), CStream, Stream, Master, resample)
 
 --------------------------------------------------------------------------------
 

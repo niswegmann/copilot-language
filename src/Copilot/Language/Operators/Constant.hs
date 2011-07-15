@@ -9,11 +9,12 @@ module Copilot.Language.Operators.Constant
   ) where
 
 import Copilot.Core (Typed)
-import Copilot.Language.Stream
+import Copilot.Language.Clock
+import Copilot.Language.Node
 
 --------------------------------------------------------------------------------
 
-constant :: Typed a => a -> Stream a
-constant = Const
+constant :: Typed a => a -> CStream p a
+constant = CStream . Const
 
 --------------------------------------------------------------------------------
