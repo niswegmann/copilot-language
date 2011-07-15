@@ -20,7 +20,7 @@ module Copilot.Language
   , module Copilot.Language.Operators.Ord
   , module Copilot.Language.Operators.Temporal
   , Spec
-  , Clock
+  , Clock (..)
   , CStream
   , Stream
   , Master

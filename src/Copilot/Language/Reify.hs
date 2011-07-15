@@ -12,7 +12,7 @@ module Copilot.Language.Reify
   ( reify
   ) where
 
-import Copilot.Core (Typed, Id, typeOf)
+import Copilot.Core (Typed, Type, Id, typeOf)
 import qualified Copilot.Core as Core
 import Copilot.Language.Analyze (analyze)
 import Copilot.Language.Spec
@@ -121,7 +121,8 @@ mkExpr refMkId refStreams refMap = go
                            Append _ _ _ ->
                              do
                                s <- mkStream refMkId refStreams refMap e1
-                               return $ WrapExpr $ Core.drop typeOf (fromIntegral k) s
+                               return $ WrapExpr $
+                                 Core.drop typeOf (fromIntegral k) s
                            _ -> error "dfs: Drop" -- !!! Fix this !!!
       Const x         -> return $ WrapExpr $ Core.const typeOf x
       Local e f       -> do
@@ -161,11 +162,11 @@ mkStream
 mkStream refMkId refStreams refMap e0 =
   do
     dstn <- makeDynStableName e0
-    let Append buf _ e = e0 -- avoids warning
+    let Append buf guard e = e0 -- !! suppress warning !!
     mk <- haveVisited dstn
     case mk of
       Just id_ -> return id_
-      Nothing  -> addToVisited dstn buf e
+      Nothing  -> addToVisited dstn buf guard e
 
   where
 
@@ -181,21 +182,27 @@ mkStream refMkId refStreams refMap e0 =
     :: Typed a
     => DynStableName
     -> [a]
+    -> Maybe (Node Bool)
     -> Node a
     -> IO Id
-  addToVisited dstn buf e =
+  addToVisited dstn buf guard e =
     do
       id <- mkId refMkId
       modifyIORef refStreams (M.insert dstn id)
+      g <- mkGuard guard
       w <- mkExpr refMkId refStreams refMap e
       modifyIORef refMap $ (:)
         Core.Stream
           { Core.streamId         = id
           , Core.streamBuffer     = buf
-          , Core.streamGuard      = Nothing
+          , Core.streamGuard      = unWrapExpr g
           , Core.streamExpr       = unWrapExpr w
           , Core.streamExprType   = typeOf }
       return id
+
+  mkGuard :: Maybe (Node Bool) -> IO (WrapExpr Bool)
+  mkGuard Nothing  = return $ WrapExpr (Core.const (typeOf :: Type Bool) True)
+  mkGuard (Just e) = mkExpr refMkId refStreams refMap e
 
 --------------------------------------------------------------------------------
 
